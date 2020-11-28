@@ -19,6 +19,7 @@ defmodule Rsoffers.Offers do
   """
   def list_offers do
     Repo.all(Offer)
+    |> Repo.preload([:user, :status, :authors, :tags])
   end
 
   @doc """
@@ -35,7 +36,9 @@ defmodule Rsoffers.Offers do
       ** (Ecto.NoResultsError)
 
   """
-  def get_offer!(id), do: Repo.get!(Offer, id)
+  def get_offer!(id), do:
+    Repo.get!(Offer, id)
+    |> Repo.preload([:user, :status, :authors, :tags])
 
   @doc """
   Creates a offer.
@@ -115,6 +118,7 @@ defmodule Rsoffers.Offers do
   """
   def list_offer_authors do
     Repo.all(Author)
+    |> Repo.preload([:offer, :user])
   end
 
   @doc """
@@ -131,7 +135,9 @@ defmodule Rsoffers.Offers do
       ** (Ecto.NoResultsError)
 
   """
-  def get_author!(id), do: Repo.get!(Author, id)
+  def get_author!(id), do:
+    Repo.get!(Author, id)
+    |> Repo.preload([:offer, :user])
 
   @doc """
   Creates a author.

@@ -4,59 +4,40 @@ defmodule RsoffersWeb.Api.OfferController do
   alias Rsoffers.Offers
   alias Rsoffers.Offers.Offer
 
+  action_fallback RsoffersWeb.FallbackController
+
   def index(conn, _params) do
     offers = Offers.list_offers()
-    render(conn, "index.html", offers: offers)
-  end
-
-  def new(conn, _params) do
-    changeset = Offers.change_offer(%Offer{})
-    render(conn, "new.html", changeset: changeset)
+    render(conn, "index.json", offers: offers)
   end
 
   def create(conn, %{"offer" => offer_params}) do
-    case Offers.create_offer(offer_params) do
-      {:ok, offer} ->
-        conn
-        |> put_flash(:info, "Offer created successfully.")
-        |> redirect(to: Routes.api_offer_path(conn, :show, offer))
-
-      {:error, %Ecto.Changeset{} = changeset} ->
-        render(conn, "new.html", changeset: changeset)
+    with {:ok, %Offer{} = offer} <- Offers.create_offer(offer_params) do
+      conn
+      |> put_status(:created)
+      |> put_resp_header("location", Routes.api_offer_path(conn, :show, offer))
+      |> render("show.json", offer: offer)
     end
   end
 
   def show(conn, %{"id" => id}) do
     offer = Offers.get_offer!(id)
-    render(conn, "show.html", offer: offer)
-  end
-
-  def edit(conn, %{"id" => id}) do
-    offer = Offers.get_offer!(id)
-    changeset = Offers.change_offer(offer)
-    render(conn, "edit.html", offer: offer, changeset: changeset)
+    render(conn, "show.json", offer: offer)
   end
 
   def update(conn, %{"id" => id, "offer" => offer_params}) do
     offer = Offers.get_offer!(id)
 
-    case Offers.update_offer(offer, offer_params) do
-      {:ok, offer} ->
-        conn
-        |> put_flash(:info, "Offer updated successfully.")
-        |> redirect(to: Routes.api_offer_path(conn, :show, offer))
-
-      {:error, %Ecto.Changeset{} = changeset} ->
-        render(conn, "edit.html", offer: offer, changeset: changeset)
+    with {:ok, %Offer{} = offer} <- Offers.update_offer(offer, offer_params) do
+      render(conn, "show.json", offer: offer)
     end
   end
 
   def delete(conn, %{"id" => id}) do
     offer = Offers.get_offer!(id)
-    {:ok, _offer} = Offers.delete_offer(offer)
 
-    conn
-    |> put_flash(:info, "Offer deleted successfully.")
-    |> redirect(to: Routes.api_offer_path(conn, :index))
+    with {:ok, %Offer{}} <- Offers.delete_offer(offer) do
+      send_resp(conn, :no_content, "")
+    end
   end
 end

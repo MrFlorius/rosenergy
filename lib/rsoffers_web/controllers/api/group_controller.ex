@@ -4,59 +4,40 @@ defmodule RsoffersWeb.Api.GroupController do
   alias Rsoffers.Groups
   alias Rsoffers.Groups.Group
 
+  action_fallback RsoffersWeb.FallbackController
+
   def index(conn, _params) do
     groups = Groups.list_groups()
-    render(conn, "index.html", groups: groups)
-  end
-
-  def new(conn, _params) do
-    changeset = Groups.change_group(%Group{})
-    render(conn, "new.html", changeset: changeset)
+    render(conn, "index.json", groups: groups)
   end
 
   def create(conn, %{"group" => group_params}) do
-    case Groups.create_group(group_params) do
-      {:ok, group} ->
-        conn
-        |> put_flash(:info, "Group created successfully.")
-        |> redirect(to: Routes.api_group_path(conn, :show, group))
-
-      {:error, %Ecto.Changeset{} = changeset} ->
-        render(conn, "new.html", changeset: changeset)
+    with {:ok, %Group{} = group} <- Groups.create_group(group_params) do
+      conn
+      |> put_status(:created)
+      |> put_resp_header("location", Routes.api_group_path(conn, :show, group))
+      |> render("show.json", group: group)
     end
   end
 
   def show(conn, %{"id" => id}) do
     group = Groups.get_group!(id)
-    render(conn, "show.html", group: group)
-  end
-
-  def edit(conn, %{"id" => id}) do
-    group = Groups.get_group!(id)
-    changeset = Groups.change_group(group)
-    render(conn, "edit.html", group: group, changeset: changeset)
+    render(conn, "show.json", group: group)
   end
 
   def update(conn, %{"id" => id, "group" => group_params}) do
     group = Groups.get_group!(id)
 
-    case Groups.update_group(group, group_params) do
-      {:ok, group} ->
-        conn
-        |> put_flash(:info, "Group updated successfully.")
-        |> redirect(to: Routes.api_group_path(conn, :show, group))
-
-      {:error, %Ecto.Changeset{} = changeset} ->
-        render(conn, "edit.html", group: group, changeset: changeset)
+    with {:ok, %Group{} = group} <- Groups.update_group(group, group_params) do
+      render(conn, "show.json", group: group)
     end
   end
 
   def delete(conn, %{"id" => id}) do
     group = Groups.get_group!(id)
-    {:ok, _group} = Groups.delete_group(group)
 
-    conn
-    |> put_flash(:info, "Group deleted successfully.")
-    |> redirect(to: Routes.api_group_path(conn, :index))
+    with {:ok, %Group{}} <- Groups.delete_group(group) do
+      send_resp(conn, :no_content, "")
+    end
   end
 end

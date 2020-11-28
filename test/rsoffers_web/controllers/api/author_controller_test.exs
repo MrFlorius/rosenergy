@@ -2,9 +2,14 @@ defmodule RsoffersWeb.Api.AuthorControllerTest do
   use RsoffersWeb.ConnCase
 
   alias Rsoffers.Offers
+  alias Rsoffers.Offers.Author
 
-  @create_attrs %{precentage: "120.5"}
-  @update_attrs %{precentage: "456.7"}
+  @create_attrs %{
+    precentage: "120.5"
+  }
+  @update_attrs %{
+    precentage: "456.7"
+  }
   @invalid_attrs %{precentage: nil}
 
   def fixture(:author) do
@@ -12,60 +17,54 @@ defmodule RsoffersWeb.Api.AuthorControllerTest do
     author
   end
 
+  setup %{conn: conn} do
+    {:ok, conn: put_req_header(conn, "accept", "application/json")}
+  end
+
   describe "index" do
     test "lists all offer_authors", %{conn: conn} do
       conn = get(conn, Routes.api_author_path(conn, :index))
-      assert html_response(conn, 200) =~ "Listing Offer authors"
-    end
-  end
-
-  describe "new author" do
-    test "renders form", %{conn: conn} do
-      conn = get(conn, Routes.api_author_path(conn, :new))
-      assert html_response(conn, 200) =~ "New Author"
+      assert json_response(conn, 200)["data"] == []
     end
   end
 
   describe "create author" do
-    test "redirects to show when data is valid", %{conn: conn} do
+    test "renders author when data is valid", %{conn: conn} do
       conn = post(conn, Routes.api_author_path(conn, :create), author: @create_attrs)
-
-      assert %{id: id} = redirected_params(conn)
-      assert redirected_to(conn) == Routes.api_author_path(conn, :show, id)
+      assert %{"id" => id} = json_response(conn, 201)["data"]
 
       conn = get(conn, Routes.api_author_path(conn, :show, id))
-      assert html_response(conn, 200) =~ "Show Author"
+
+      assert %{
+               "id" => id,
+               "precentage" => "120.5"
+             } = json_response(conn, 200)["data"]
     end
 
     test "renders errors when data is invalid", %{conn: conn} do
       conn = post(conn, Routes.api_author_path(conn, :create), author: @invalid_attrs)
-      assert html_response(conn, 200) =~ "New Author"
-    end
-  end
-
-  describe "edit author" do
-    setup [:create_author]
-
-    test "renders form for editing chosen author", %{conn: conn, author: author} do
-      conn = get(conn, Routes.api_author_path(conn, :edit, author))
-      assert html_response(conn, 200) =~ "Edit Author"
+      assert json_response(conn, 422)["errors"] != %{}
     end
   end
 
   describe "update author" do
     setup [:create_author]
 
-    test "redirects when data is valid", %{conn: conn, author: author} do
+    test "renders author when data is valid", %{conn: conn, author: %Author{id: id} = author} do
       conn = put(conn, Routes.api_author_path(conn, :update, author), author: @update_attrs)
-      assert redirected_to(conn) == Routes.api_author_path(conn, :show, author)
+      assert %{"id" => ^id} = json_response(conn, 200)["data"]
 
-      conn = get(conn, Routes.api_author_path(conn, :show, author))
-      assert html_response(conn, 200)
+      conn = get(conn, Routes.api_author_path(conn, :show, id))
+
+      assert %{
+               "id" => id,
+               "precentage" => "456.7"
+             } = json_response(conn, 200)["data"]
     end
 
     test "renders errors when data is invalid", %{conn: conn, author: author} do
       conn = put(conn, Routes.api_author_path(conn, :update, author), author: @invalid_attrs)
-      assert html_response(conn, 200) =~ "Edit Author"
+      assert json_response(conn, 422)["errors"] != %{}
     end
   end
 
@@ -74,7 +73,8 @@ defmodule RsoffersWeb.Api.AuthorControllerTest do
 
     test "deletes chosen author", %{conn: conn, author: author} do
       conn = delete(conn, Routes.api_author_path(conn, :delete, author))
-      assert redirected_to(conn) == Routes.api_author_path(conn, :index)
+      assert response(conn, 204)
+
       assert_error_sent 404, fn ->
         get(conn, Routes.api_author_path(conn, :show, author))
       end

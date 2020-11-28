@@ -65,7 +65,7 @@ defmodule RsoffersWeb.Offers.OfferController do
   def download(conn, %{"id" => id}) do
     offer = Offers.get_offer!(id)
 
-    with {:ok, doc} = Rsoffers.DocFmt.render("test.docx", %{value: "hi from elixir"}) do
+    with {:ok, doc} <- Rsoffers.DocFmt.render("test.docx", %{value: "hi from elixir"}) do
       conn
       |> put_resp_content_type("text/csv")
       |> put_resp_header(

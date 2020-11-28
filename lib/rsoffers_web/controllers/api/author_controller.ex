@@ -4,59 +4,40 @@ defmodule RsoffersWeb.Api.AuthorController do
   alias Rsoffers.Offers
   alias Rsoffers.Offers.Author
 
+  action_fallback RsoffersWeb.FallbackController
+
   def index(conn, _params) do
     offer_authors = Offers.list_offer_authors()
-    render(conn, "index.html", offer_authors: offer_authors)
-  end
-
-  def new(conn, _params) do
-    changeset = Offers.change_author(%Author{})
-    render(conn, "new.html", changeset: changeset)
+    render(conn, "index.json", offer_authors: offer_authors)
   end
 
   def create(conn, %{"author" => author_params}) do
-    case Offers.create_author(author_params) do
-      {:ok, author} ->
-        conn
-        |> put_flash(:info, "Author created successfully.")
-        |> redirect(to: Routes.api_author_path(conn, :show, author))
-
-      {:error, %Ecto.Changeset{} = changeset} ->
-        render(conn, "new.html", changeset: changeset)
+    with {:ok, %Author{} = author} <- Offers.create_author(author_params) do
+      conn
+      |> put_status(:created)
+      |> put_resp_header("location", Routes.api_author_path(conn, :show, author))
+      |> render("show.json", author: author)
     end
   end
 
   def show(conn, %{"id" => id}) do
     author = Offers.get_author!(id)
-    render(conn, "show.html", author: author)
-  end
-
-  def edit(conn, %{"id" => id}) do
-    author = Offers.get_author!(id)
-    changeset = Offers.change_author(author)
-    render(conn, "edit.html", author: author, changeset: changeset)
+    render(conn, "show.json", author: author)
   end
 
   def update(conn, %{"id" => id, "author" => author_params}) do
     author = Offers.get_author!(id)
 
-    case Offers.update_author(author, author_params) do
-      {:ok, author} ->
-        conn
-        |> put_flash(:info, "Author updated successfully.")
-        |> redirect(to: Routes.api_author_path(conn, :show, author))
-
-      {:error, %Ecto.Changeset{} = changeset} ->
-        render(conn, "edit.html", author: author, changeset: changeset)
+    with {:ok, %Author{} = author} <- Offers.update_author(author, author_params) do
+      render(conn, "show.json", author: author)
     end
   end
 
   def delete(conn, %{"id" => id}) do
     author = Offers.get_author!(id)
-    {:ok, _author} = Offers.delete_author(author)
 
-    conn
-    |> put_flash(:info, "Author deleted successfully.")
-    |> redirect(to: Routes.api_author_path(conn, :index))
+    with {:ok, %Author{}} <- Offers.delete_author(author) do
+      send_resp(conn, :no_content, "")
+    end
   end
 end

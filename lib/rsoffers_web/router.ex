@@ -50,15 +50,16 @@ defmodule RsoffersWeb.Router do
     end
   end
 
-  scope "/api", RsoffersWeb, as: :api do
+  scope "/api", RsoffersWeb.Api, as: :api do
     pipe_through :api
 
     resources "/groups", GroupController
     resources "/users", UserController
+    resources "/offer_authors", AuthorController
     resources "/offer_status", StatusController
     resources "/offers", OfferController
+    resources "/tags", TagController
     resources "/certificates", CertificateController
-    resources "/offer_authors", AuthorController
   end
 
   # Enables LiveDashboard only for development

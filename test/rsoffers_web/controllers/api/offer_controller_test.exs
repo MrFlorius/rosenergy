@@ -2,9 +2,20 @@ defmodule RsoffersWeb.Api.OfferControllerTest do
   use RsoffersWeb.ConnCase
 
   alias Rsoffers.Offers
+  alias Rsoffers.Offers.Offer
 
-  @create_attrs %{description: "some description", name: "some name", outcome: "some outcome", solution: "some solution"}
-  @update_attrs %{description: "some updated description", name: "some updated name", outcome: "some updated outcome", solution: "some updated solution"}
+  @create_attrs %{
+    description: "some description",
+    name: "some name",
+    outcome: "some outcome",
+    solution: "some solution"
+  }
+  @update_attrs %{
+    description: "some updated description",
+    name: "some updated name",
+    outcome: "some updated outcome",
+    solution: "some updated solution"
+  }
   @invalid_attrs %{description: nil, name: nil, outcome: nil, solution: nil}
 
   def fixture(:offer) do
@@ -12,60 +23,60 @@ defmodule RsoffersWeb.Api.OfferControllerTest do
     offer
   end
 
+  setup %{conn: conn} do
+    {:ok, conn: put_req_header(conn, "accept", "application/json")}
+  end
+
   describe "index" do
     test "lists all offers", %{conn: conn} do
       conn = get(conn, Routes.api_offer_path(conn, :index))
-      assert html_response(conn, 200) =~ "Listing Offers"
-    end
-  end
-
-  describe "new offer" do
-    test "renders form", %{conn: conn} do
-      conn = get(conn, Routes.api_offer_path(conn, :new))
-      assert html_response(conn, 200) =~ "New Offer"
+      assert json_response(conn, 200)["data"] == []
     end
   end
 
   describe "create offer" do
-    test "redirects to show when data is valid", %{conn: conn} do
+    test "renders offer when data is valid", %{conn: conn} do
       conn = post(conn, Routes.api_offer_path(conn, :create), offer: @create_attrs)
-
-      assert %{id: id} = redirected_params(conn)
-      assert redirected_to(conn) == Routes.api_offer_path(conn, :show, id)
+      assert %{"id" => id} = json_response(conn, 201)["data"]
 
       conn = get(conn, Routes.api_offer_path(conn, :show, id))
-      assert html_response(conn, 200) =~ "Show Offer"
+
+      assert %{
+               "id" => id,
+               "description" => "some description",
+               "name" => "some name",
+               "outcome" => "some outcome",
+               "solution" => "some solution"
+             } = json_response(conn, 200)["data"]
     end
 
     test "renders errors when data is invalid", %{conn: conn} do
       conn = post(conn, Routes.api_offer_path(conn, :create), offer: @invalid_attrs)
-      assert html_response(conn, 200) =~ "New Offer"
-    end
-  end
-
-  describe "edit offer" do
-    setup [:create_offer]
-
-    test "renders form for editing chosen offer", %{conn: conn, offer: offer} do
-      conn = get(conn, Routes.api_offer_path(conn, :edit, offer))
-      assert html_response(conn, 200) =~ "Edit Offer"
+      assert json_response(conn, 422)["errors"] != %{}
     end
   end
 
   describe "update offer" do
     setup [:create_offer]
 
-    test "redirects when data is valid", %{conn: conn, offer: offer} do
+    test "renders offer when data is valid", %{conn: conn, offer: %Offer{id: id} = offer} do
       conn = put(conn, Routes.api_offer_path(conn, :update, offer), offer: @update_attrs)
-      assert redirected_to(conn) == Routes.api_offer_path(conn, :show, offer)
+      assert %{"id" => ^id} = json_response(conn, 200)["data"]
 
-      conn = get(conn, Routes.api_offer_path(conn, :show, offer))
-      assert html_response(conn, 200) =~ "some updated description"
+      conn = get(conn, Routes.api_offer_path(conn, :show, id))
+
+      assert %{
+               "id" => id,
+               "description" => "some updated description",
+               "name" => "some updated name",
+               "outcome" => "some updated outcome",
+               "solution" => "some updated solution"
+             } = json_response(conn, 200)["data"]
     end
 
     test "renders errors when data is invalid", %{conn: conn, offer: offer} do
       conn = put(conn, Routes.api_offer_path(conn, :update, offer), offer: @invalid_attrs)
-      assert html_response(conn, 200) =~ "Edit Offer"
+      assert json_response(conn, 422)["errors"] != %{}
     end
   end
 
@@ -74,7 +85,8 @@ defmodule RsoffersWeb.Api.OfferControllerTest do
 
     test "deletes chosen offer", %{conn: conn, offer: offer} do
       conn = delete(conn, Routes.api_offer_path(conn, :delete, offer))
-      assert redirected_to(conn) == Routes.api_offer_path(conn, :index)
+      assert response(conn, 204)
+
       assert_error_sent 404, fn ->
         get(conn, Routes.api_offer_path(conn, :show, offer))
       end
