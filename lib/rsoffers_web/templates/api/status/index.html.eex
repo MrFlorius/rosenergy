@@ -1,0 +1,26 @@
+<h1>Listing Offer status</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Description</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+<%= for status <- @offer_status do %>
+    <tr>
+      <td><%= status.description %></td>
+
+      <td>
+        <span><%= link "Show", to: Routes.api_status_path(@conn, :show, status) %></span>
+        <span><%= link "Edit", to: Routes.api_status_path(@conn, :edit, status) %></span>
+        <span><%= link "Delete", to: Routes.api_status_path(@conn, :delete, status), method: :delete, data: [confirm: "Are you sure?"] %></span>
+      </td>
+    </tr>
+<% end %>
+  </tbody>
+</table>
+
+<span><%= link "New Status", to: Routes.api_status_path(@conn, :new) %></span>

@@ -1,0 +1,31 @@
+defmodule Rsoffers.Offers.Offer do
+  use Ecto.Schema
+  import Ecto.Changeset
+
+  schema "offers" do
+    field :description, :string
+    field :name, :string
+    field :outcome, :string
+    field :solution, :string
+
+    belongs_to :user, Rsoffers.Users.User
+    belongs_to :status, Rsoffers.OfferStatus.Status
+
+    has_many :authors, Rsoffers.Offers.Author
+    many_to_many :tags, Rsoffers.Tags.Tag, join_through: "offers_tags", on_replace: :delete
+
+    timestamps()
+  end
+
+  @doc false
+  def changeset(offer, attrs) do
+    offer
+    |> cast(attrs, [:name, :description, :solution, :outcome, :user_id, :status_id])
+    |> validate_required([:name, :description, :solution, :outcome, :status_id])
+  end
+
+  def changeset_tags(offer, tags, attrs) do
+    changeset(offer, attrs)
+    |> put_assoc(:tags, tags)
+  end
+end

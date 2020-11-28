@@ -1,0 +1,23 @@
+<%= form_for @changeset, @action, fn f -> %>
+  <%= if @changeset.action do %>
+    <div class="alert alert-danger">
+      <p>Oops, something went wrong! Please check the errors below.</p>
+    </div>
+  <% end %>
+
+  <%= label f, :user %>
+  <%= select f, :user_id, get_user_opts(), selected: get_current_user(@certificate) %>
+  <%= error_tag f, :user %>
+
+  <%= label f, :offer %>
+  <%= select f, :offer_id, get_offer_opts(), selected: get_current_offer(@certificate) %>
+  <%= error_tag f, :offer %>
+
+  <%= label f, :status %>
+  <%= select f, :status_id, get_status_opts(), selected: get_current_status(@certificate) %>
+  <%= error_tag f, :status %>
+
+  <div>
+    <%= submit "Save" %>
+  </div>
+<% end %>

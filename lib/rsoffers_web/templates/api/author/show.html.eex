@@ -1,0 +1,13 @@
+<h1>Show Author</h1>
+
+<ul>
+
+  <li>
+    <strong>Precentage:</strong>
+    <%= @author.precentage %>
+  </li>
+
+</ul>
+
+<span><%= link "Edit", to: Routes.api_author_path(@conn, :edit, @author) %></span>
+<span><%= link "Back", to: Routes.api_author_path(@conn, :index) %></span>

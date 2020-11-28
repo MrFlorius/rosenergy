@@ -1,0 +1,8 @@
+<section class="row">
+  <ul>
+    <li><%= link "Status" , to: Routes.offers_status_path(@conn, :index) %></li>
+    <li><%= link "Tags"   , to: Routes.offers_tag_path(@conn, :index) %></li>
+    <li><%= link "Offers" , to: Routes.offers_offer_path(@conn, :index) %></li>
+    <li><%= link "Certificates", to: Routes.offers_certificate_path(@conn, :index) %> </li>
+  </ul>
+</section>
