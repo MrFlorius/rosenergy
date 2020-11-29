@@ -47,7 +47,7 @@ defmodule RsoffersWeb.Api.OfferController do
 
     with {:ok, doc} <- Rsoffers.DocFmt.render("offer.docx", to_py_offer(offer)) do
       conn
-      |> put_resp_content_type("text/csv")
+      |> put_resp_content_type("text/docx")
       |> put_resp_header(
         "content-disposition",
         "attachment; filename=\"Заявление на рацпредложение #{offer.name}.docx\"")
