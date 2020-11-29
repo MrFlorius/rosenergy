@@ -50,6 +50,7 @@ defmodule Rsoffers.MixProject do
       {:decimal, "~> 2.0"},
       {:timex, "~> 3.5"},
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
+      {:cors_plug, "~> 2.0.2"},
       {:ecto_psql_extras, "~> 0.2"},
     ]
   end

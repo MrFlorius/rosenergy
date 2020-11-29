@@ -21,6 +21,10 @@
   <%= text_input f, :outcome %>
   <%= error_tag f, :outcome %>
 
+  <%= label f, :benefits %>
+  <%= text_input f, :benefits %>
+  <%= error_tag f, :benefits %>
+
   <%= label f, :status %>
   <%= select f, :status_id, get_status_opts(), selected: get_current_status(assigns) %>
   <%= error_tag f, :status %>

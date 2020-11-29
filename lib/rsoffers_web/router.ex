@@ -11,6 +11,7 @@ defmodule RsoffersWeb.Router do
   end
 
   pipeline :api do
+    plug CORSPlug, origin: "*"
     plug :accepts, ["json"]
   end
 
@@ -22,7 +23,13 @@ defmodule RsoffersWeb.Router do
   scope "/", RsoffersWeb do
     pipe_through :browser
 
-    get "/", PageController, :index
+    get "/", FrontendController, :index
+    get "/projects/create", FrontendController, :index
+    get "/projects", FrontendController, :index
+    get "/project/:id", FrontendController, :index
+    get "/myprojects", FrontendController, :index
+
+    get "/old", PageController, :index
   end
 
   scope "/auth" do
@@ -44,7 +51,6 @@ defmodule RsoffersWeb.Router do
     resources "/certificates", CertificateController
     resources "/tags", TagController
 
-    get "/:id/download", OfferController, :download
     resources "/", OfferController do
       resources "/authors", AuthorController
     end
@@ -53,13 +59,28 @@ defmodule RsoffersWeb.Router do
   scope "/api", RsoffersWeb.Api, as: :api do
     pipe_through :api
 
+    get "/offers/:id/download", OfferController, :download
+
     resources "/groups", GroupController
+    options "/groups", GroupController, :options
+
     resources "/users", UserController
+    options "/users", UserController, :options
+
     resources "/offer_authors", AuthorController
+    options "/offer_authors", AuthorController, :options
+
     resources "/offer_status", StatusController
+    options "/offer_status", StatusController, :options
+
     resources "/offers", OfferController
+    options "/offers", OfferController, :options
+
     resources "/tags", TagController
+    options "/tags", TagController, :options
+
     resources "/certificates", CertificateController
+    options "/certificates", CertificateController, :options
   end
 
   # Enables LiveDashboard only for development

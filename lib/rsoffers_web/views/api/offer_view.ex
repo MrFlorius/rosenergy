@@ -18,6 +18,7 @@ defmodule RsoffersWeb.Api.OfferView do
       outcome: offer.outcome,
       status_id: offer.status_id,
       user_id: offer.user_id,
+      benefits: offer.benefits,
       user: render_one(offer.user, RsoffersWeb.Api.UserView, "user.json"),
       status: render_one(offer.status, RsoffersWeb.Api.StatusView, "status.json"),
       authors: render_many(offer.authors, RsoffersWeb.Api.AuthorView, "author.json"),

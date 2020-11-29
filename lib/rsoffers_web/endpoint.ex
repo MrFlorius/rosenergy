@@ -26,6 +26,17 @@ defmodule RsoffersWeb.Endpoint do
     gzip: false,
     only: ~w(css fonts images js favicon.ico robots.txt)
 
+  plug Plug.Static,
+    at: "/",
+    from: {:rsoffers, "priv/static/frontend/build"},
+    gzip: false
+
+  # plug Plug.Static,
+  #   at: "/frontend/",
+  #   from: {:rsoffers, "priv/static/frontend/"},
+  #   gzip: false,
+  #   only: ~w(index.html)
+
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.
   if code_reloading? do

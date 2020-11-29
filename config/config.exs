@@ -15,6 +15,7 @@ config :rsoffers, :pow,
   repo: Rsoffers.Repo,
   web_module: RsoffersWeb
 
+config :pow, Pow.Ecto.Schema.Password, password_min_length: 4
 
 # Configures the endpoint
 config :rsoffers, RsoffersWeb.Endpoint,

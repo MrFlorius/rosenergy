@@ -13,6 +13,7 @@ defmodule RsoffersWeb.Api.AuthorView do
   def render("author.json", %{author: author}) do
     %{id: author.id,
       user_id: author.user_id,
+      offer_id: author.offer_id,
       precentage: author.precentage}
   end
 end

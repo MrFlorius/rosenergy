@@ -7,6 +7,12 @@ defmodule Rsoffers.Users.User do
   schema "users" do
     field :first_name, :string
     field :last_name, :string
+    field :organisation, :string
+    field :department, :string
+    field :year_of_birth, :string
+    field :job, :string
+    field :education, :string
+    field :expirience, :string
 
     belongs_to :group, Rsoffers.Groups.Group
 
@@ -22,7 +28,7 @@ defmodule Rsoffers.Users.User do
 
   def changeset(user, attrs) do
     user
-    |> cast(attrs, [:first_name, :last_name, :group_id])
+    |> cast(attrs, [:first_name, :last_name, :group_id, :organisation, :department, :year_of_birth, :job, :education, :expirience])
     |> validate_required([:first_name, :last_name])
     |> pow_changeset(attrs)
   end

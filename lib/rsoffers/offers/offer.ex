@@ -6,6 +6,7 @@ defmodule Rsoffers.Offers.Offer do
     field :description, :string
     field :name, :string
     field :outcome, :string
+    field :benefits, :string
     field :solution, :string
 
     belongs_to :user, Rsoffers.Users.User
@@ -19,13 +20,19 @@ defmodule Rsoffers.Offers.Offer do
 
   @doc false
   def changeset(offer, attrs) do
+
     offer
-    |> cast(attrs, [:name, :description, :solution, :outcome, :user_id, :status_id])
-    |> validate_required([:name, :description, :solution, :outcome, :status_id])
+    |> cast(attrs, [:name, :description, :solution, :outcome, :benefits, :user_id, :status_id])
+    |> validate_required([:name, :description, :solution, :outcome, :benefits, :status_id])
+    |> fn x ->
+      case get_tags(attrs, :tags) do
+        nil -> x
+        tags -> cast_assoc(x, :tags, tags)
+      end
+    end.()
   end
 
-  def changeset_tags(offer, tags, attrs) do
-    changeset(offer, attrs)
-    |> put_assoc(:tags, tags)
+  defp get_tags(attrs, atom) do
+    Map.get(attrs, to_string(atom), Map.get(attrs, atom))
   end
 end

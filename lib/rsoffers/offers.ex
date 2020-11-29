@@ -73,6 +73,7 @@ defmodule Rsoffers.Offers do
   def update_offer(%Offer{} = offer, attrs) do
     offer
     |> Offer.changeset(attrs)
+    |> IO.inspect()
     |> Repo.update()
   end
 

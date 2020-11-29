@@ -61,17 +61,4 @@ defmodule RsoffersWeb.Offers.OfferController do
     |> put_flash(:info, "Offer deleted successfully.")
     |> redirect(to: Routes.offers_offer_path(conn, :index))
   end
-
-  def download(conn, %{"id" => id}) do
-    offer = Offers.get_offer!(id)
-
-    with {:ok, doc} <- Rsoffers.DocFmt.render("test.docx", %{value: "hi from elixir"}) do
-      conn
-      |> put_resp_content_type("text/csv")
-      |> put_resp_header(
-        "content-disposition",
-        "attachment; filename=\"Заявление на рацпредложение #{offer.name}.docx\"")
-      |> send_resp(200, doc)
-    end
-  end
 end
